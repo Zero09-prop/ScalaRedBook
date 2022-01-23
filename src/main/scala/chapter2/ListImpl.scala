@@ -17,7 +17,6 @@ object ListImpl extends App {
 
     def product(ds: MyList[Double]): Double = ds match {
       case Nil => 1.0
-      case Cons(0.0, _) => 0.0
       case Cons(x, xs) => x * product(xs)
     }
 
@@ -48,8 +47,28 @@ object ListImpl extends App {
     }
 
     def init[A](ls: MyList[A]): MyList[A] = ls match {
-      case Cons(h, t) => if(t != Nil) Cons(h,init(t)) else Nil
+      case Cons(h, t) => if (t != Nil) Cons(h, init(t)) else Nil
     }
+
+    def foldRight[A, B](as: MyList[A], z: B)(f: (A, B) => B): B =
+      as match {
+        case Nil => z
+        case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+      }
+
+    def length[A](as: MyList[A]): Int = foldRight(as, 0)((_, b) => b + 1)
+
+    @tailrec
+    def foldLeft[A, B](as: MyList[A], z: B)(f: (B, A) => B): B = as match {
+      case Nil => z
+      case Cons(h, _) => foldLeft(tail(as), f(z, h))(f)
+    }
+
+    def sum2(ls: MyList[Int]): Int = foldLeft(ls, 0)(_ + _)
+
+    def product2(ls: MyList[Double]): Double = foldLeft(ls, 1.0)(_ * _)
+
+    def length2[A](ls: MyList[A]): Int = foldLeft(ls, 0)((z, _) => z + 1)
   }
 
   val x = MyList(1, 2, 3, 4, 5) match {
@@ -59,5 +78,5 @@ object ListImpl extends App {
     case Cons(h, t) => h + MyList.sum(t)
     case _ => 101
   }
-  println(MyList.dropWhile(MyList(1, 2, 3, 4, 5), (x: Int) => x < 4))
+  println(MyList.length2(MyList(1, 2, 5)))
 }
