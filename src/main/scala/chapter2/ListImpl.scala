@@ -1,5 +1,7 @@
 package chapter2
 
+import scala.annotation.tailrec
+
 object ListImpl extends App {
   sealed trait MyList[+A]
 
@@ -32,6 +34,22 @@ object ListImpl extends App {
       case Nil => Cons(el, Nil)
       case t: Cons[A] => Cons(el, t)
     }
+
+    @tailrec
+    def drop[A](ls: MyList[A], n: Int): MyList[A] = n match {
+      case 1 => tail(ls)
+      case _ => drop(tail(ls), n - 1)
+    }
+
+    @tailrec
+    def dropWhile[A](ls: MyList[A], f: A => Boolean): MyList[A] = ls match {
+      case Cons(h, t) => if (f(h)) dropWhile(t, f) else Cons(h, t)
+      case _ => ls
+    }
+
+    def init[A](ls: MyList[A]): MyList[A] = ls match {
+      case Cons(h, t) => if(t != Nil) Cons(h,init(t)) else Nil
+    }
   }
 
   val x = MyList(1, 2, 3, 4, 5) match {
@@ -41,5 +59,5 @@ object ListImpl extends App {
     case Cons(h, t) => h + MyList.sum(t)
     case _ => 101
   }
-
+  println(MyList.dropWhile(MyList(1, 2, 3, 4, 5), (x: Int) => x < 4))
 }
