@@ -75,6 +75,32 @@ object ListImpl extends App {
     def foldLeft2[A, B](as: MyList[A], z: B)(f: (B, A) => B): B = foldRight(as, z)((a, b) => f(b, a))
 
     def foldRight2[A, B](as: MyList[A], z: B)(f: (A, B) => B): B = foldLeft(as, z)((b, a) => f(a, b))
+
+    def append1[A](ls1: MyList[A], ls2: MyList[A]): MyList[A] = foldRight(ls1, ls2)((e, l) => Cons(e, l))
+
+    def append2[A](ls1: MyList[A], ls2: MyList[A]): MyList[A] = foldLeft(reverse(ls1), ls2)((l, e) => Cons(e, l))
+
+    def flat[A](lst: MyList[MyList[A]]): MyList[A] = lst match {
+      case Nil => Nil
+      case Cons(h, t) => append2(foldRight(h, Nil: MyList[A])((el, a) => Cons(el, a)), flat(t))
+    }
+
+
+    def inc(ls: MyList[Int]): MyList[Int] = ls match {
+      case Nil => Nil
+      case Cons(h, t) => Cons(h + 1, inc(t))
+    }
+
+    def lstString(ls: MyList[Double]): MyList[String] = ls match {
+      case Nil => Nil
+      case Cons(h, t) => Cons(h.toString, lstString(t))
+    }
+
+    def map[A, B](ls: MyList[A])(f: A => B): MyList[B] = reverse(foldLeft(ls, Nil: MyList[B])((l, el) => Cons(f(el), l)))
+
+
+    def filter[A](ls: MyList[A])(f: A => Boolean): MyList[A] = reverse(foldLeft(ls, Nil: MyList[A])((l, el) => if (f(el)) Cons(el, l) else l))
+    def flatMap
   }
 
   val x = MyList(1, 2, 3, 4, 5) match {
@@ -84,5 +110,5 @@ object ListImpl extends App {
     case Cons(h, t) => h + MyList.sum(t)
     case _ => 101
   }
-  println(MyList.foldLeft2(MyList(1, 2, 5), 1.0)(_ * _))
+  println(MyList.filter(MyList(1, 2, 3, 4))((x: Int) => x % 2 == 0))
 }
