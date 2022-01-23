@@ -69,6 +69,12 @@ object ListImpl extends App {
     def product2(ls: MyList[Double]): Double = foldLeft(ls, 1.0)(_ * _)
 
     def length2[A](ls: MyList[A]): Int = foldLeft(ls, 0)((z, _) => z + 1)
+
+    def reverse[A](ls: MyList[A]): MyList[A] = foldLeft(ls, Nil: MyList[A])((x, y) => Cons(y, x))
+
+    def foldLeft2[A, B](as: MyList[A], z: B)(f: (B, A) => B): B = foldRight(as, z)((a, b) => f(b, a))
+
+    def foldRight2[A, B](as: MyList[A], z: B)(f: (A, B) => B): B = foldLeft(as, z)((b, a) => f(a, b))
   }
 
   val x = MyList(1, 2, 3, 4, 5) match {
@@ -78,5 +84,5 @@ object ListImpl extends App {
     case Cons(h, t) => h + MyList.sum(t)
     case _ => 101
   }
-  println(MyList.length2(MyList(1, 2, 5)))
+  println(MyList.foldLeft2(MyList(1, 2, 5), 1.0)(_ * _))
 }
