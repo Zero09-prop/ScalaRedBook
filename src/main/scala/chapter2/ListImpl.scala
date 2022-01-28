@@ -133,14 +133,24 @@ object ListImpl extends App {
         case (Cons(h1, t1), Cons(h2, t2)) => Cons(f(h1, h2), zipWith(t1, t2)(f))
       }
 
-    @tailrec
-    def hasSubsequence[A](sup: MyList[A], sub: MyList[A]): Boolean =
-      (sup, sub) match {
-        case (Nil, _) => false
-        case (_, Nil) => true
-        case (a: Cons[A], b: Cons[A]) =>
-          if (a.head == b.head) hasSubsequence(a.tail, b.tail) else hasSubsequence(a.tail, b)
-      }
+    def hasSubsequence[A](sup: MyList[A], sub: MyList[A]): Boolean = {
+      @tailrec
+      def go(l1: MyList[A], l2: MyList[A]): Boolean =
+        (l1, l2) match {
+          case (Nil, _)                 => false
+          case (_, Nil)                 => true
+          case (a: Cons[A], b: Cons[A]) => if (a.head == b.head) loop(a.tail, b.tail) else go(a.tail, b)
+        }
+      @tailrec
+      def loop(l1: MyList[A], l2: MyList[A]): Boolean =
+        (l1, l2) match {
+          case (_, Nil)                 => true
+          case (Nil, c: Cons[A])        => false
+          case (a: Cons[A], b: Cons[A]) => if (a.head == b.head) loop(a.tail, b.tail) else false
+        }
+
+      go(sup, sub)
+    }
   }
 
   val x = MyList(1, 2, 3, 4, 5) match {
@@ -150,6 +160,6 @@ object ListImpl extends App {
     case Cons(h, t)                            => h + MyList.sum(t)
     case _                                     => 101
   }
-  println(MyList.hasSubsequence(MyList(1, 2, 3, 4, 5, 6), MyList(1, 4)))
+  println(MyList.hasSubsequence(MyList(1, 2, 3, 4, 5, 6), MyList()))
 
 }
