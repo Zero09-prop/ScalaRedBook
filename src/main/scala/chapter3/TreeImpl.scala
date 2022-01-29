@@ -28,7 +28,24 @@ object TreeImpl extends App {
         case Branch(l, r) => Branch(map(l)(f), map(r)(f))
         case Leaf(v)      => Leaf(f(v))
       }
+    def fold[A, B](tree: Tree[A], f: A => B)(g: (B, B) => B): B =
+      tree match {
+        case Leaf(v)      => f(v)
+        case Branch(l, r) => g(fold(l, f)(g), fold(r, f)(g))
+      }
+
+    def size2[A](tree: Tree[A]): Int =
+      fold[A, Int](tree, _ => 1)(1 + _ + _)
+
+    def maximum2(tree: Tree[Int]): Int =
+      fold[Int, Int](tree, x => x)(_ max _)
+
+    def depth2[A](tree: Tree[A]): Int =
+      fold[A, Int](tree, _ => 0)(1 + _ max 1 + _)
+
+    def map2[A, B](tree: Tree[A])( f: A => B): Tree[B] =
+      fold[A, Tree[B]](tree, x => Leaf(f(x)))(Branch(_, _))
   }
 
-  println(Tree.map(Branch(Leaf(2), Branch(Branch(Leaf(3), Leaf(5)), Leaf(4))))(_ * 2))
+  println(Tree.map2(Branch(Leaf(2), Branch(Branch(Leaf(3), Leaf(5)), Leaf(4))))(_ * 2))
 }
