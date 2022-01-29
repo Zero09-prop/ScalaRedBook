@@ -14,17 +14,21 @@ object TreeImpl extends App {
 
     def maximum(tree: Tree[Int]): Int =
       tree match {
-        case Branch(l,r) => maximum(l) max maximum(r)
-        case Leaf(value) => value
+        case Branch(l, r) => maximum(l) max maximum(r)
+        case Leaf(value)  => value
       }
 
     def depth[A](tree: Tree[A]): Int =
       tree match {
         case Branch(left, right) => 1 + depth(left) max 1 + depth(right)
-        case _: Leaf[A] => 0
-    }
-
+        case _: Leaf[A]          => 0
+      }
+    def map[A, B](tree: Tree[A])(f: A => B): Tree[B] =
+      tree match {
+        case Branch(l, r) => Branch(map(l)(f), map(r)(f))
+        case Leaf(v)      => Leaf(f(v))
+      }
   }
 
-  println(Tree.depth(Branch(Leaf(2), Branch(Branch(Leaf(3),Leaf(5)), Leaf(4)))))
+  println(Tree.map(Branch(Leaf(2), Branch(Branch(Leaf(3), Leaf(5)), Leaf(4))))(_ * 2))
 }
