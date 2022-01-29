@@ -1,4 +1,4 @@
-package chapter2
+package chapter3
 
 import scala.annotation.tailrec
 
@@ -160,6 +160,6 @@ object ListImpl extends App {
     case Cons(h, t)                            => h + MyList.sum(t)
     case _                                     => 101
   }
-  println(MyList.hasSubsequence(MyList(1, 2, 3, 4, 5, 6), MyList()))
+  println(MyList.hasSubsequence(MyList(1, 2, 3, 4, 5, 6), MyList(1,6)))
 
 }
