@@ -2,6 +2,8 @@ package chapter4
 
 import chapter3.ListImpl.MyList
 
+import java.time.{LocalDate, LocalDateTime}
+
 object MyOption extends App {
   sealed trait MyOption[+A] {
 
@@ -29,7 +31,12 @@ object MyOption extends App {
       else MyNone
     }
     def sequence[A](a: MyList[MyOption[A]]): MyOption[MyList[A]] =
-      MyList.foldLeft(a, MyOption(MyList[A]())) { (ac, el) => el.flatMap(e => ac.map(ls => MyList.append(ls, e))) }
+      MyList.foldLeft(a, MyOption(MyList[A]())) { (acc, el) => el.flatMap(e => acc.map(ls => MyList.prepend(ls, e))) }
+
+    def traverse[A, B](ls: MyList[A])(f: A => MyOption[B]): MyOption[MyList[B]] =
+      MyList.foldLeft(ls, MyOption(MyList[B]()))((acc, el) => acc.flatMap(lst => f(el).map(b => MyList.prepend(lst, b))))
+
+    def traverse2[A, B](ls: MyList[A])(f: A => MyOption[B]): MyOption[MyList[B]] = sequence(MyList.map(ls)(f))
 
   }
   case class MySome[+A](get: A) extends MyOption[A]
@@ -44,5 +51,4 @@ object MyOption extends App {
   def map2[A, B, C](aOpt: MyOption[A], bOpt: MyOption[B])(f: (A, B) => C): MyOption[C] =
     aOpt.flatMap(a => bOpt.flatMap(b => MySome(f(a, b))))
 
-  println(MyOption.sequence(MyList(MyOption(1), MyOption(2), MyOption(3))))
 }
