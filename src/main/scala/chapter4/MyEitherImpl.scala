@@ -34,7 +34,7 @@ object MyEitherImpl extends App {
       for {
         a <- el
         ls <- ac
-      } yield (ls :+ a)
+      } yield ls :+ a
     }
 
   def traverse[E, A, B](as: List[A])(f: A => MyEither[E, B]): MyEither[E, List[B]] =
@@ -42,9 +42,7 @@ object MyEitherImpl extends App {
       for {
         b <- f(a)
         ls <- ac
-      } yield (ls :+ b)
+      } yield ls :+ b
     }
-
-
 
 }
